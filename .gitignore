@@ -3,3 +3,4 @@
 ./build
 *.iso
 iso/
+uefi_x86_64.wiki
