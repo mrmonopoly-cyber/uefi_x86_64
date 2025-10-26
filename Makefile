@@ -1,29 +1,26 @@
 ## user input parameters
 FEATURES ?=
-TARGET ?= x86_64-elf
+TARGET ?= x86_64-w64-mingw32
 
 ## compilation parameters
 SRC := src
+INCLUDES := -Iinclude
 ISODIR := iso
 BUILD := build
-DEPS := $(shell find $(SRC) -type f -name "*.S")
-LD_SCRIPT := $(shell find $(SRC) -type f -name "*.ld")
-OBJS := $(patsubst $(SRC)/%.S,$(BUILD)/%.o,$(DEPS))
+DEPS := $(shell find $(SRC) -type f -name "*.c")
+OBJS := $(patsubst $(SRC)/%.c,$(BUILD)/%.o,$(DEPS))
 OBIN := kernel.elf
 
 
-CC = $(TARGET)-gcc
-LD = $(TARGET)-ld
+CC = clang
 
-CFLAGS = -ffreestanding -O2 -Wall -Wextra -m64
-LDFLAGS = -nostdlib -T $(LD_SCRIPT)
-
+CFLAGS = --target=$(TARGET) -ffreestanding -O2 -Wall -Wextra -m64 $(INCLUDES)
 
 
 all: $(OBIN) $(ISODIR)
 
-$(OBIN): $(OBJS) src/linker.ld
-	$(LD) $(LDFLAGS) $(OBJS) -o $(OBIN)
+$(OBIN): $(OBJS)
+	$(CC) $(CFLAGS) $(FEATURES) $(OBJS) -o $(OBIN)
 
 $(ISODIR): $(OBIN) grub/grub.cfg
 	mkdir -p $(ISODIR)/boot/grub
@@ -37,11 +34,19 @@ run: $(ISODIR)
 	-bios /usr/share/ovmf/x64/OVMF.4m.fd \
 	-cdrom myos.$(ISODIR)
 
-$(BUILD)/%.o: $(SRC)/%.S
+$(BUILD)/%.o: $(SRC)/%.c
 	@mkdir -p $(dir $@)
 	$(CC) -o $@ $< -c $(CFLAGS) $(FEATURES) $(WARNINGS)
 
+doc:
+	git clone https://github.com/mrmonopoly-cyber/uefi_x86_64.wiki.git
+
+setup: doc
+	bear -- make
 
 clean:
 	rm -rf *.o *.elf $(ISODIR) *.iso $(ISODIR) $(BUILD)
+
+clean-all: clean
+	rm -rf ./compile_commands.json ./.cache ./uefi_x86_64.wiki
 
