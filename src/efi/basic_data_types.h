@@ -54,14 +54,17 @@ typedef uint16_t CHAR16;
 
 typedef void VOID;
 
-typedef UINT128 EFI_GUID;
+//******************************************************
+//EFI_GUID
+//******************************************************
+typedef struct {
+  UINT32 Data1;
+  UINT16 Data2;
+  UINT16 Data3;
+  UINT8 Data4[8];
+} EFI_GUID;
 
 typedef UINTN EFI_STATUS;
-enum
-{
-  EFI_SUCCES,
-  EFI_OUT_OF_RESOURCES,
-};
 
 typedef VOID* EFI_HANDLE;
 typedef VOID* EFI_EVENT;
@@ -88,3 +91,12 @@ typedef struct
 {
   uint16_t cells[4];
 }EFI_IP_ADDRESS;
+
+//INFO: EFI Table Header, Section 4.2
+typedef struct {
+  UINT64 Signature;
+  UINT32 Revision;
+  UINT32 HeaderSize;
+  UINT32 CRC32;
+  UINT32 Reserved;
+} EFI_TABLE_HEADER;

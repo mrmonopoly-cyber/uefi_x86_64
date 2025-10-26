@@ -4,23 +4,29 @@ TARGET ?= x86_64-w64-mingw32
 
 ## compilation parameters
 SRC := src
-INCLUDES := -Iinclude
+INCLUDES := -Iinclude -I/usr/x86_64-w64-mingw32/include
 ISODIR := iso
 BUILD := build
 DEPS := $(shell find $(SRC) -type f -name "*.c")
 OBJS := $(patsubst $(SRC)/%.c,$(BUILD)/%.o,$(DEPS))
-OBIN := kernel.elf
-
+OBIN := kernel.efi
 
 CC = clang
+LD = lld-link
 
-CFLAGS = --target=$(TARGET) -ffreestanding -O2 -Wall -Wextra -m64 $(INCLUDES)
+CFLAGS = --target=$(TARGET) -ffreestanding -O2 \
+				 -Wall -Wextra \
+				 -fshort-wchar \
+				 -m64 \
+				 -mno-red-zone \
+				 $(INCLUDES) 
 
+LDFLAGS = -subsystem:efi_application -entry:EfiMain
 
 all: $(OBIN) $(ISODIR)
 
 $(OBIN): $(OBJS)
-	$(CC) $(CFLAGS) $(FEATURES) $(OBJS) -o $(OBIN)
+	$(LD) $(LDFLAGS) $(OBJS) -out:$(OBIN)
 
 $(ISODIR): $(OBIN) grub/grub.cfg
 	mkdir -p $(ISODIR)/boot/grub

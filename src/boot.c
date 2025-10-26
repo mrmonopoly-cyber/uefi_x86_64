@@ -1,5 +1,11 @@
 #include "efi/efi.h"
 
-EFI_STATUS efi_main (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable)
+typedef enum
 {
+ EFI_STATUS_MAIN_EFI_SUCCES,
+ EFI_STATUS_MAIN_EFI_OUT_OF_RESOURCES,
+}EFI_STATUS_MAIN;
+EFI_STATUS_MAIN EfiMain (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable)
+{
+  return EFI_STATUS_MAIN_EFI_SUCCES; 
 }
