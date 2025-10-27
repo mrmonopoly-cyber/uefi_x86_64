@@ -45,8 +45,9 @@ $(BUILD)/%.o: $(SRC)/%.c
 doc:
 	git clone https://github.com/mrmonopoly-cyber/uefi_x86_64.wiki.git
 
-setup: doc
+setup: 
 	bear -- make
+	make doc
 
 clean:
 	rm -rf *.o *.elf $(ISODIR) *.iso $(ISODIR) $(BUILD)

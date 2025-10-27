@@ -4,7 +4,7 @@
 //INFO: Basic Data Types Section 2.3.1
 
 #include <stdint.h>
-#include "arch.h"
+#include <arch.h>
 
 typedef uint8_t BOOLEAN;
 enum
