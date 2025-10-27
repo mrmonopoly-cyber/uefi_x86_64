@@ -26,19 +26,17 @@ LDFLAGS = -subsystem:efi_application -entry:EfiMain
 all: $(OBIN) $(ISODIR)
 
 $(OBIN): $(OBJS)
-	$(LD) $(LDFLAGS) $(OBJS) -out:$(OBIN)
+	$(LD) $(LDFLAGS) $(OBJS) -out:$(BUILD)/$(OBIN)
 
-$(ISODIR): $(OBIN) grub/grub.cfg
-	mkdir -p $(ISODIR)/boot/grub
-	cp $(OBIN) $(ISODIR)/boot/
-	cp grub/grub.cfg $(ISODIR)/boot/grub/
-	grub-mkrescue -o myos.$(ISODIR) $(ISODIR)
+$(ISODIR): $(OBIN)
+	mkdir -p $(ISODIR)/EFI/BOOT/
+	cp $(BUILD)/$(OBIN) $(ISODIR)/EFI/BOOT/BOOTX64.efi
 
 run: $(ISODIR)
 	qemu-system-x86_64 \
 	-net none \
 	-bios /usr/share/ovmf/x64/OVMF.4m.fd \
-	-cdrom myos.$(ISODIR)
+	-drive format=raw,file=fat:rw:iso
 
 $(BUILD)/%.o: $(SRC)/%.c
 	@mkdir -p $(dir $@)
@@ -54,5 +52,5 @@ clean:
 	rm -rf *.o *.elf $(ISODIR) *.iso $(ISODIR) $(BUILD)
 
 clean-all: clean
-	rm -rf ./compile_commands.json ./.cache ./uefi_x86_64.wiki
+	rm -rf ./compile_commands.json ./.cache ./uefi_x86_64.wiki $(ISODIR)
 
