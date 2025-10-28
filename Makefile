@@ -1,58 +1,41 @@
 ## user input parameters
 FEATURES ?=
-TARGET ?= x86_64-w64-mingw32
 
 ## compilation parameters
 SRC := src
-INCLUDES := -Iinclude -I/usr/x86_64-w64-mingw32/include
-ISODIR := iso
+EFI_BOOTSTRAP_SRC := $(SRC)/bootstrap
+KERNEL_SRC := $(SRC)/kernel
 BUILD := build
-DEPS := $(shell find $(SRC) -type f -name "*.c")
-OBJS := $(patsubst $(SRC)/%.c,$(BUILD)/%.o,$(DEPS))
-OBIN := kernel.efi
-DISKIMG := disk.img
+ISODIR := iso
 
-CC = clang
-LD = lld-link
+INCLUDES := -Iinclude
 
-CFLAGS = --target=$(TARGET) -ffreestanding -O2 \
-				 -Wall -Wextra \
-				 -fshort-wchar \
-				 -m64 \
-				 -mno-red-zone \
-				 $(INCLUDES) 
+EFI_BOOTSTRAP_OBIN := $(BUILD)/bootloader.efi
 
 LDFLAGS = -subsystem:efi_application -entry:EfiMain
 
-all: $(OBIN) $(ISODIR)
+.PHONY: build 
 
-$(OBIN): $(OBJS)
-	$(LD) $(LDFLAGS) $(OBJS) -out:$(BUILD)/$(OBIN)
+build: $(EFI_BOOTSTRAP_OBIN)
 
-$(ISODIR): $(OBIN)
-	dd if=/dev/zero of=$(DISKIMG) bs=512 count=93750
-	mkdir -p $(ISODIR)/EFI/BOOT/
-	cp $(BUILD)/$(OBIN) $(ISODIR)/EFI/BOOT/BOOTX64.efi
-
-run: $(ISODIR)
+run: $(EFI_BOOTSTRAP_OBIN)
+	cp $(EFI_BOOTSTRAP_OBIN) $(ISODIR)/EFI/BOOT
 	qemu-system-x86_64 \
 	-net none \
 	-bios /usr/share/ovmf/x64/OVMF.4m.fd \
 	-drive format=raw,file=fat:rw:iso
 
-$(BUILD)/%.o: $(SRC)/%.c
-	@mkdir -p $(dir $@)
-	$(CC) -o $@ $< -c $(CFLAGS) $(FEATURES) $(WARNINGS)
-
 doc:
 	git clone https://github.com/mrmonopoly-cyber/uefi_x86_64.wiki.git
 
 setup: 
-	bear -- make
+	bear -- make build
 	make doc
 
 clean:
-	rm -rf *.o *.elf $(ISODIR) *.iso $(ISODIR) $(BUILD) $(DISKIMG)
+	rm -rf $(ISODIR) $(BUILD)
 
 clean-all: clean
 	rm -rf ./compile_commands.json ./.cache ./uefi_x86_64.wiki
+
+include $(EFI_BOOTSTRAP_SRC)/Makefile
