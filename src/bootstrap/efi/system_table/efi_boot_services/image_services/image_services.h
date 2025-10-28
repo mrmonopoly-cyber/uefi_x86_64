@@ -30,12 +30,12 @@ typedef enum
  EFI_STATUS_EFI_IMAGE_LOAD_EFI_SECURITY_VIOLATION, //INFO: Image was loaded and an ImageHandle was created with a valid EFI_LOADED_IMAGE_PROTOCOL. However, the current platform policy specifies that the image should not be started.
 }EFI_STATUS_EFI_IMAGE_LOAD;
 typedef EFI_STATUS_EFI_IMAGE_LOAD(*EFI_IMAGE_LOAD) (
-    BOOLEAN BootPolicy,
-    EFI_HANDLE ParentImageHandle,
-    EFI_DEVICE_PATH_PROTOCOL *DevicePath OPTIONAL,
-    VOID *SourceBuffer OPTIONAL,
-    UINTN SourceSize,
-    EFI_HANDLE *ImageHandle);
+    IN BOOLEAN BootPolicy,
+    IN EFI_HANDLE ParentImageHandle,
+    IN EFI_DEVICE_PATH_PROTOCOL *DevicePath OPTIONAL,
+    IN VOID *SourceBuffer OPTIONAL,
+    IN UINTN SourceSize,
+    OUT EFI_HANDLE *ImageHandle);
 
 typedef enum
 {

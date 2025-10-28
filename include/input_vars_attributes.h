@@ -1,4 +1,5 @@
 #pragma once
 
 #define OPTIONAL 
-#define ANYSIZE_ARRAY
+#define IN
+#define OUT

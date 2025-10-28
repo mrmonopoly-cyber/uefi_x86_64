@@ -10,6 +10,7 @@ BUILD := build
 DEPS := $(shell find $(SRC) -type f -name "*.c")
 OBJS := $(patsubst $(SRC)/%.c,$(BUILD)/%.o,$(DEPS))
 OBIN := kernel.efi
+DISKIMG := disk.img
 
 CC = clang
 LD = lld-link
@@ -29,6 +30,7 @@ $(OBIN): $(OBJS)
 	$(LD) $(LDFLAGS) $(OBJS) -out:$(BUILD)/$(OBIN)
 
 $(ISODIR): $(OBIN)
+	dd if=/dev/zero of=$(DISKIMG) bs=512 count=93750
 	mkdir -p $(ISODIR)/EFI/BOOT/
 	cp $(BUILD)/$(OBIN) $(ISODIR)/EFI/BOOT/BOOTX64.efi
 
@@ -50,8 +52,7 @@ setup:
 	make doc
 
 clean:
-	rm -rf *.o *.elf $(ISODIR) *.iso $(ISODIR) $(BUILD)
+	rm -rf *.o *.elf $(ISODIR) *.iso $(ISODIR) $(BUILD) $(DISKIMG)
 
 clean-all: clean
-	rm -rf ./compile_commands.json ./.cache ./uefi_x86_64.wiki $(ISODIR)
-
+	rm -rf ./compile_commands.json ./.cache ./uefi_x86_64.wiki

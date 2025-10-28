@@ -1,7 +1,8 @@
 #pragma once
 
+#include <array_attributes.h>
+
 #include "../basic_data_types.h"
-#include "input_vars_attributes.h"
 
 #define WIN_CERT_TYPE_PKCS_SIGNED_DATA 0x0002
 #define WIN_CERT_TYPE_EFI_PKCS115 0x0EF0
