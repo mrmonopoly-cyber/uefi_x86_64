@@ -1,6 +1,7 @@
 #include <stddef.h>
 
 #include "efi/efi.h"
+#include "util/util.h"
 
 typedef enum
 {
@@ -11,38 +12,26 @@ EFI_STATUS_MAIN EfiMain (EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable)
 {
   EFI_STATUS err =0;
 
-  EFI_HANDLE kernel_handle = NULL;
-  EFI_DEVICE_PATH_PROTOCOL kernel_path ={0};
-
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *ConOut = SystemTable->ConOut;
 
-    CHAR16 unicode_alive_string[128] = {};
-    CHAR8 alive_string[] =  "bootloader alive mex\n\r";
-    alive_string[2]+=err;
-    for (UINT8 i=0; i<sizeof(alive_string); i++)
-    {
-      unicode_alive_string[(2*i)+1] = alive_string[i];
-    }
+  CHAR8 alive_mex[] = "bootloader alive\n\r";
+  CHAR16 outchar[16] = {0};
 
-  ConOut->OutputString(ConOut,unicode_alive_string);
-
-  if((err=SystemTable->BootServices->LoadImage(
-        TRUE,
-        ImageHandle,
-        &kernel_path,
-        NULL,
-        0,
-        &kernel_handle))!=0)
+  if(conv_str_u8_u16(alive_mex, outchar,sizeof(alive_mex))!=S_U8_TO_U16_SUCCESS)
   {
-    CHAR16 unicode_err_string[128] = {};
-    CHAR8 err_string[] =  "error loading image: 0";
-    err_string[2]+=err;
-    for (UINT8 i=0; i<sizeof(err_string); i++)
-    {
-      unicode_err_string[2*i] = err_string[i];
-    }
-    ConOut->OutputString(ConOut,unicode_err_string);
+    CHAR16 err_conv[] = {'K','K','\n','\r','\0'};
+    ConOut->OutputString(ConOut,err_conv);
   }
+
+  if((err+=ConOut->OutputString(ConOut,outchar))!=EFI_STATUS_EFI_TEXT_STRING_EFI_SUCCESS)
+  {
+    CHAR16 err_conv[] = {0};
+    CHAR8 err_str[] =  "error alive mex\n\r";
+    conv_str_u8_u16(err_str, err_conv, sizeof(err_str));
+    ConOut->OutputString(ConOut,err_conv);
+  }
+
+  LOOP(ConOut);
 
   return EFI_STATUS_MAIN_EFI_SUCCES; 
 }
