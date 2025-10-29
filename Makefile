@@ -28,8 +28,10 @@ run: $(EFI_BOOTSTRAP_OBIN)
 doc:
 	git clone https://github.com/mrmonopoly-cyber/uefi_x86_64.wiki.git
 
-setup: 
+clang-lsp:
 	bear -- make build
+
+dev-setup-setup: clang-lsp
 	make doc
 
 clean:
