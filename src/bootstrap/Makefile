@@ -7,9 +7,9 @@ BOOTSTRAP_OBIN ?= $(BUILD)/bootloader.efi
 
 ## compilation parameters
 TARGET := x86_64-w64-mingw32
-EFI_BOOTSTRAP_SRC := .
-DEPS := $(shell find $(EFI_BOOTSTRAP_SRC) -type f -name "*.c")
-EFI_BOOTSTRAP_OBJS := $(patsubst $(EFI_BOOTSTRAP_SRC)/%.c,$(BUILD)/%.o,$(DEPS))
+EFI_BOOTSTRAP_SRC := $(SRC)/.
+EFI_BOOTSTRAP_DEPS := $(shell find $(EFI_BOOTSTRAP_SRC) -type f -name "*.c")
+EFI_BOOTSTRAP_OBJS := $(patsubst $(EFI_BOOTSTRAP_SRC)/%.c,$(BUILD)/%.o,$(EFI_BOOTSTRAP_DEPS))
 
 CC = clang
 LD = lld-link

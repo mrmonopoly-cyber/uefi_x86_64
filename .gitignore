@@ -7,3 +7,4 @@ uefi_x86_64.wiki
 .cache
 compile_commands.json
 build
+uefi_image

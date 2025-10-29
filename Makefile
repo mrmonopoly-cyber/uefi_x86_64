@@ -4,6 +4,7 @@ FEATURES ?=
 ## compilation parameters
 SRC := src
 EFI_BOOTSTRAP_SRC := $(SRC)/bootstrap
+EFI_IMAGE_SRC := uefi_image
 KERNEL_SRC := $(SRC)/kernel
 BUILD := build
 ISODIR := iso
@@ -31,13 +32,20 @@ doc:
 clang-lsp:
 	bear -- make build
 
-dev-setup-setup: clang-lsp
+uefi_image:
+	git clone https://github.com/mrmonopoly-cyber/uefi_image.git
+
+dev-setup: clang-lsp  uefi_image
 	make doc
 
 clean:
 	rm -rf $(ISODIR) $(BUILD)
 
 clean-all: clean
-	rm -rf ./compile_commands.json ./.cache ./uefi_x86_64.wiki
+	rm -rf \
+		compile_commands.json \
+		.cache \
+		uefi_x86_64.wiki \
+		uefi_image
 
 include $(EFI_BOOTSTRAP_SRC)/Makefile
